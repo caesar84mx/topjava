@@ -52,7 +52,11 @@ public class UserMealsUtil {
                                                                         int caloriesPerDay)
     {
         Map<LocalDate, Integer> totalCalPerDay = new HashMap<>();
-        for (UserMeal meal: mealList)
+
+        mealList.forEach(meal -> totalCalPerDay.merge(meal.getDateTime().toLocalDate(), meal.getCalories(),
+                (ov, nv) -> ov + nv));
+
+        /*for (UserMeal meal: mealList)
         {
             if (!totalCalPerDay.containsKey(meal.getDateTime().toLocalDate()))
                 totalCalPerDay.put(meal.getDateTime().toLocalDate(), meal.getCalories());
@@ -61,7 +65,7 @@ public class UserMealsUtil {
                 int sum = totalCalPerDay.get(meal.getDateTime().toLocalDate()) + meal.getCalories();
                 totalCalPerDay.put(meal.getDateTime().toLocalDate(), sum);
             }
-        }
+        }*/
 
         List<UserMealWithExceed> resultList = new ArrayList<>();
         for (UserMeal meal: mealList)
