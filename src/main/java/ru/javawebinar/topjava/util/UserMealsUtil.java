@@ -54,7 +54,7 @@ public class UserMealsUtil {
         Map<LocalDate, Integer> totalCalPerDay = new HashMap<>();
 
         mealList.forEach(meal -> totalCalPerDay.merge(meal.getDateTime().toLocalDate(), meal.getCalories(),
-                (ov, nv) -> ov + nv));
+                Integer::sum));
 
         /*for (UserMeal meal: mealList)
         {
