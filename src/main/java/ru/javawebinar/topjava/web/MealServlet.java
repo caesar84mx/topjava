@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Comparator;
 import java.util.List;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -57,6 +58,7 @@ public class MealServlet extends HttpServlet {
         List<Meal> mealList = mealService.getList();
         List<MealWithExceed> mealWithExceedList =
                 MealsUtil.getFilteredWithExceeded(mealList, LocalTime.MIN, LocalTime.MAX, 2000);
+        mealWithExceedList.sort(Comparator.comparing(MealWithExceed::getDateTime));
         req.setAttribute("meals", mealWithExceedList);
         req.getRequestDispatcher(forward).forward(req, resp);
     }
