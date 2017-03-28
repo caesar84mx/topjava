@@ -27,7 +27,7 @@
         </tr>
         <tr>
             <td>Калорийность:</td>
-            <td><input type="text" name="calories" value="${editedMeal.calories}"></td>
+            <td><input type="number" name="calories" value="${editedMeal.calories}"></td>
         </tr>
         <tr>
             <td colspan="1"><input type="submit" value="Отправить"></td>

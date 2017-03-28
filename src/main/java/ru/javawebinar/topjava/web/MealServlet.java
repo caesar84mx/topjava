@@ -25,10 +25,11 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 public class MealServlet extends HttpServlet {
     private static final Logger LOG = getLogger(MealServlet.class);
-    private final MealService mealService;
+    private MealService mealService;
 
-    public MealServlet() {
-        super();
+    @Override
+    public void init() throws ServletException {
+        super.init();
         mealService = new MealServiceHardcodedImpl();
     }
 
@@ -42,6 +43,7 @@ public class MealServlet extends HttpServlet {
             if (action.equalsIgnoreCase("delete")) {
                 int mealId = Integer.parseInt(req.getParameter("mealId"));
                 mealService.deleteById(mealId);
+                LOG.info("Element deleted");
             }
             //meals?action=createOrUpdate&mealId=1
             else if (action.equalsIgnoreCase("createOrUpdate"))
@@ -52,10 +54,15 @@ public class MealServlet extends HttpServlet {
                 else meal = new Meal(LocalDateTime.now().withSecond(0).withNano(0), "Введите описание", 500);
                 req.setAttribute("editedMeal", meal);
                 forward = "/mealEdit.jsp";
+                req.getRequestDispatcher(forward).forward(req, resp);
+                return;
             }
         }
 
         List<Meal> mealList = mealService.getList();
+        LOG.info("Got a meals list from database: ");
+        mealList.forEach(meal -> LOG.info(meal.toString()));
+
         List<MealWithExceed> mealWithExceedList =
                 MealsUtil.getFilteredWithExceeded(mealList, LocalTime.MIN, LocalTime.MAX, 2000);
         mealWithExceedList.sort(Comparator.comparing(MealWithExceed::getDateTime));
@@ -74,7 +81,12 @@ public class MealServlet extends HttpServlet {
         Meal meal = new Meal(dateTime, description, calories);
         meal.setId(id);
 
+        String logInfo;
+        if (meal.getId() == 0) logInfo = "New element" + meal + "has been inserted";
+        else logInfo = "Element" + meal + "has been updated";
+
         mealService.saveOrUpdate(meal);
+        LOG.info(logInfo);
 
         resp.sendRedirect("meals");
     }

@@ -3,11 +3,11 @@ package ru.javawebinar.topjava.dao;
 import ru.javawebinar.topjava.model.Meal;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 /**
  * Created by caesar-84 on 3/26/17.
@@ -16,7 +16,7 @@ public class MealDaoHardcodedImpl implements MealDao {
     private static Map<Integer, Meal> hcMealDb = new ConcurrentHashMap<>();
     private static final AtomicInteger counter = new AtomicInteger(1);
 
-    static
+    private MealDaoHardcodedImpl()
     {
         //день первый
         LocalDateTime dateTime = LocalDateTime.of(2017, 3, 1, 7, 0);
@@ -109,8 +109,6 @@ public class MealDaoHardcodedImpl implements MealDao {
         hcMealDb.put(meal.getId(), meal);
     }
 
-    private MealDaoHardcodedImpl(){}
-
     private static class Holder
     {
         private static final MealDaoHardcodedImpl INSTANCE = new MealDaoHardcodedImpl();
@@ -142,8 +140,6 @@ public class MealDaoHardcodedImpl implements MealDao {
 
     @Override
     public List<Meal> getList() {
-        return hcMealDb.entrySet().stream()
-                .map(Map.Entry::getValue)
-                .collect(Collectors.toList());
+        return new ArrayList<>(hcMealDb.values());
     }
 }
