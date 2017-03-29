@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.MealWithExceed;
 import ru.javawebinar.topjava.service.MealService;
-import ru.javawebinar.topjava.service.MealServiceHardcodedImpl;
+import ru.javawebinar.topjava.service.MealServiceInMemoryImpl;
 import ru.javawebinar.topjava.util.MealsUtil;
 
 import javax.servlet.ServletException;
@@ -30,7 +30,7 @@ public class MealServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         super.init();
-        mealService = new MealServiceHardcodedImpl();
+        mealService = MealServiceInMemoryImpl.getInstance();
     }
 
     @Override
@@ -61,7 +61,7 @@ public class MealServlet extends HttpServlet {
 
         List<Meal> mealList = mealService.getList();
         LOG.info("Got a meals list from database: ");
-        mealList.forEach(meal -> LOG.info(meal.toString()));
+        mealList.forEach(meal -> LOG.trace(meal.toString()));
 
         List<MealWithExceed> mealWithExceedList =
                 MealsUtil.getFilteredWithExceeded(mealList, LocalTime.MIN, LocalTime.MAX, 2000);
@@ -82,8 +82,7 @@ public class MealServlet extends HttpServlet {
         meal.setId(id);
 
         String logInfo;
-        if (meal.getId() == 0) logInfo = "New element" + meal + "has been inserted";
-        else logInfo = "Element" + meal + "has been updated";
+        logInfo = meal.getId() == 0 ? "New element" + meal + "has been inserted" : "Element" + meal + "has been updated";
 
         mealService.saveOrUpdate(meal);
         LOG.info(logInfo);

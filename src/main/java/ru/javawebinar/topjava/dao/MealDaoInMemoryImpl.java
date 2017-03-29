@@ -12,11 +12,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Created by caesar-84 on 3/26/17.
  */
-public class MealDaoHardcodedImpl implements MealDao {
+public class MealDaoInMemoryImpl implements MealDao {
     private static Map<Integer, Meal> hcMealDb = new ConcurrentHashMap<>();
     private static final AtomicInteger counter = new AtomicInteger(1);
 
-    private MealDaoHardcodedImpl()
+    private MealDaoInMemoryImpl()
     {
         //день первый
         LocalDateTime dateTime = LocalDateTime.of(2017, 3, 1, 7, 0);
@@ -109,12 +109,9 @@ public class MealDaoHardcodedImpl implements MealDao {
         hcMealDb.put(meal.getId(), meal);
     }
 
-    private static class Holder
-    {
-        private static final MealDaoHardcodedImpl INSTANCE = new MealDaoHardcodedImpl();
-    }
+    private static final MealDaoInMemoryImpl INSTANCE = new MealDaoInMemoryImpl();
 
-    public static MealDaoHardcodedImpl getInstance() { return Holder.INSTANCE; }
+    public static MealDaoInMemoryImpl getInstance() { return INSTANCE; }
 
     private static int getId(){ return counter.getAndIncrement(); }
     

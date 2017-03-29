@@ -1,7 +1,7 @@
 package ru.javawebinar.topjava.service;
 
 import ru.javawebinar.topjava.dao.MealDao;
-import ru.javawebinar.topjava.dao.MealDaoHardcodedImpl;
+import ru.javawebinar.topjava.dao.MealDaoInMemoryImpl;
 import ru.javawebinar.topjava.model.Meal;
 
 import java.util.List;
@@ -9,9 +9,17 @@ import java.util.List;
 /**
  * Created by caesar-84 on 3/26/17.
  */
-public class MealServiceHardcodedImpl implements MealService
+public class MealServiceInMemoryImpl implements MealService
 {
-    private MealDao dao = MealDaoHardcodedImpl.getInstance();
+    private static final MealService INSTANCE = new MealServiceInMemoryImpl();
+    private MealDao dao;
+
+    private MealServiceInMemoryImpl()
+    {
+        dao = MealDaoInMemoryImpl.getInstance();
+    }
+
+    public static MealService getInstance() { return INSTANCE; }
 
     @Override
     public Meal getById(int id) {
