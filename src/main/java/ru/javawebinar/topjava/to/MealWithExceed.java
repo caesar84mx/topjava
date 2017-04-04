@@ -1,4 +1,6 @@
-package ru.javawebinar.topjava.model;
+package ru.javawebinar.topjava.to;
+
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
@@ -6,6 +8,7 @@ import java.time.LocalDateTime;
  * GKislin
  * 11.01.2015.
  */
+@Component
 public class MealWithExceed {
     private final Integer id;
 
