@@ -5,6 +5,8 @@ import org.springframework.stereotype.Controller;
 import ru.javawebinar.topjava.AuthorizedUser;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
+import ru.javawebinar.topjava.to.MealWithExceed;
+import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.util.List;
@@ -17,33 +19,29 @@ public class MealRestController {
 
     public Meal save(Meal meal)
     {
-        meal.setId(AuthorizedUser.id());
-        return service.save(meal);
+        if (meal.isNew()) meal.setUserId(AuthorizedUser.id());
+        return service.save(meal, AuthorizedUser.id());
     }
 
     public void delete(int id)
     {
-        service.delete(id);
+        service.delete(id, AuthorizedUser.id());
     }
 
     public Meal get(int mealId)
     {
         Meal meal;
-        try
-        {
+        try {
             meal = service.get(mealId, AuthorizedUser.id());
         }
-        catch (NotFoundException ex)
-        {
-            return null;
-        }
+        catch (NotFoundException ex) { return null; }
+
         return meal;
     }
 
-    public List<Meal> getAll()
+    public List<MealWithExceed> getAll()
     {
-        return service.getAll().stream()
-                .filter(meal -> meal.getUserId() == AuthorizedUser.id())
-                .collect(Collectors.toList());
+        return MealsUtil.getWithExceeded(service.getAll(AuthorizedUser.id()),
+                MealsUtil.DEFAULT_CALORIES_PER_DAY);
     }
 }

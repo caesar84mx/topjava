@@ -2,6 +2,7 @@ package ru.javawebinar.topjava.web;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import ru.javawebinar.topjava.AuthorizedUser;
@@ -28,17 +29,22 @@ import java.util.Objects;
 public class MealServlet extends HttpServlet {
     private static final Logger LOG = LoggerFactory.getLogger(MealServlet.class);
 
-    private MealRepository repository;
+    //private MealRepository repository;
+    @Autowired
     private MealRestController mealController;
-
+    private ConfigurableApplicationContext context;
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        repository = new InMemoryMealRepositoryImpl();
-        try (ConfigurableApplicationContext context = new ClassPathXmlApplicationContext("spring/spring-app"))
-        {
-            mealController = context.getBean(MealRestController.class);
-        }
+        //repository = new InMemoryMealRepositoryImpl();
+        context = new ClassPathXmlApplicationContext("**/spring/spring-app");
+        //mealController = context.getBean(MealRestController.class);
+    }
+
+    @Override
+    public void destroy() {
+        super.destroy();
+        context.close();
     }
 
     @Override
@@ -78,8 +84,7 @@ public class MealServlet extends HttpServlet {
             case "all":
             default:
                 LOG.info("getAll");
-                request.setAttribute("meals",
-                        MealsUtil.getWithExceeded(mealController.getAll(), MealsUtil.DEFAULT_CALORIES_PER_DAY));
+                request.setAttribute("meals", mealController.getAll());
                 request.getRequestDispatcher("/meals.jsp").forward(request, response);
                 break;
         }

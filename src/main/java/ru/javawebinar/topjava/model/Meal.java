@@ -34,14 +34,6 @@ public class Meal extends BaseEntity {
         this.userId = userId;
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
     public LocalDateTime getDateTime() {
         return dateTime;
     }
@@ -65,10 +57,6 @@ public class Meal extends BaseEntity {
     public int getUserId() { return userId; }
 
     public void setUserId(int userId) { this.userId = userId; }
-
-    public boolean isNew() {
-        return id == null;
-    }
 
     @Override
     public String toString() {

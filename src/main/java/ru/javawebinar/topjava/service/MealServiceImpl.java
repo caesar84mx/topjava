@@ -7,8 +7,7 @@ import ru.javawebinar.topjava.repository.MealRepository;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.util.Collection;
-
-import static ru.javawebinar.topjava.util.ValidationUtil.checkNotFound;
+import java.util.stream.Collectors;
 
 @Service
 public class MealServiceImpl implements MealService {
@@ -17,22 +16,33 @@ public class MealServiceImpl implements MealService {
     private MealRepository repository;
 
     @Override
-    public Meal save(Meal meal) {
+    public Meal save(Meal meal, int userId) throws NotFoundException {
+        if (meal.getId() != userId) throw
+                new NotFoundException("Error while saving. Meal " + meal.getId() +
+                        " does not belong to current user");
         return repository.save(meal);
     }
 
     @Override
-    public void delete(int id) {
-        repository.delete(id);
+    public boolean delete(int id, int userId) throws NotFoundException {
+        this.get(id, userId);
+        return repository.delete(id);
     }
 
     @Override
     public Meal get(int mealId, int userId)  throws NotFoundException {
-        return checkNotFound(repository.get(mealId, userId), "Meal ID = " + mealId + ", User ID = " + userId);
+        Meal meal = repository.get(mealId);
+        if (meal.getUserId() != userId) throw
+                new NotFoundException("Error while getting. Meal " + meal.getId() +
+                        " does not belong to current user");
+        return meal;
     }
 
     @Override
-    public Collection<Meal> getAll() {
-        return repository.getAll();
+    public Collection<Meal> getAll(int userId)
+    {
+        return repository.getAll().stream()
+                .filter(meal -> meal.getUserId() == userId)
+                .collect(Collectors.toList());
     }
 }

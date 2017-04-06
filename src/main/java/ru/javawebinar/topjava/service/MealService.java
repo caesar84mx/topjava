@@ -6,11 +6,11 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 import java.util.Collection;
 
 public interface MealService {
-    Meal save(Meal meal);
+    Meal save(Meal meal, int userId);
 
-    void delete(int id);
+    boolean delete(int id, int userId) throws NotFoundException;
 
     Meal get(int mealId, int userId) throws NotFoundException;
 
-    Collection<Meal> getAll();
+    Collection<Meal> getAll(int userId) throws NotFoundException;
 }
