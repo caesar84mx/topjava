@@ -9,7 +9,6 @@
         .normal {
             color: green;
         }
-
         .exceeded {
             color: red;
         }
