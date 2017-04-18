@@ -1,10 +1,9 @@
 package ru.javawebinar.topjava.service;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.ExpectedException;
+import org.junit.rules.Stopwatch;
+import org.junit.runner.Description;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,12 +14,12 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.rules.MealServiceRule;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
@@ -38,22 +37,56 @@ public class MealServiceTest {
         SLF4JBridgeHandler.install();
     }
 
-    private static final Logger LOG = LoggerFactory.getLogger(MealServiceRule.class);
-
+    private static final Logger LOG = LoggerFactory.getLogger(MealServiceTest.class);
+    private static final StringBuilder STATS = new StringBuilder("\nStatistics:\n");
     private static long startTime;
+
+    private static void logInfo(Description description, String status, long nanos) {
+        String testName = description.getMethodName();
+        LOG.info(String.format("Test %s %s, spent %d ms",
+                testName, status, TimeUnit.NANOSECONDS.toMillis(nanos)));
+    }
 
     @BeforeClass
     public static void beforeClass() {
-      startTime = System.currentTimeMillis();
+        startTime = System.currentTimeMillis();
     }
 
     @AfterClass
     public static void afterClass() {
-        LOG.info("Class execution time: " + (System.currentTimeMillis() - startTime) + " ms");
+        STATS.append("Total class execution time: ")
+                .append((System.currentTimeMillis() - startTime))
+                .append(" ms\n");
+        LOG.info(STATS.toString());
     }
 
     @Rule
-    public MealServiceRule rule = new MealServiceRule();
+    public Stopwatch stopwatch = new Stopwatch() {
+        @Override
+        protected void succeeded(long nanos, Description description) {
+            logInfo(description, "succeeded", nanos);
+        }
+
+        @Override
+        protected void failed(long nanos, Throwable e, Description description) {
+            logInfo(description, "failed", nanos);
+        }
+
+        @Override
+        protected void skipped(long nanos, AssumptionViolatedException e, Description description) {
+            logInfo(description, "skipped", nanos);
+        }
+
+        @Override
+        protected void finished(long nanos, Description description) {
+            logInfo(description, "finished", nanos);
+            STATS.append("- ")
+                    .append(description.getMethodName())
+                    .append(" finished in ")
+                    .append(TimeUnit.NANOSECONDS.toMillis(nanos))
+                    .append(" ms\n");
+        }
+    };
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
