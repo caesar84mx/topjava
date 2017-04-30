@@ -22,12 +22,15 @@ public interface CrudMealRepository extends JpaRepository<Meal, Integer> {
     @Override
     Meal save(Meal meal);
 
-    @Query("SELECT m FROM Meal m WHERE m.id=:id AND m.user.id=:userId")
-    Meal findOneByUserId(@Param("id") Integer id, @Param("userId") int userId);
+    @Override
+    Meal findOne(Integer id);
 
-    @Query("SELECT m FROM Meal m WHERE m.user.id=:userId")
+    @Query("SELECT m FROM Meal m WHERE m.user.id=:userId ORDER BY m.dateTime DESC")
     List<Meal> findAllByUserId(Sort sort, @Param("userId") int userId);
 
-    @Query("SELECT m FROM Meal m WHERE m.user.id=:userId AND m.dateTime BETWEEN :startTime AND :endTime")
-    List<Meal> getBetween(@Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime, @Param("userId") int userId);
+    @Query("SELECT m FROM Meal m WHERE m.user.id=:userId AND m.dateTime " +
+            "BETWEEN :startTime AND :endTime ORDER BY m.dateTime DESC ")
+    List<Meal> getBetween(@Param("startTime") LocalDateTime startTime,
+                          @Param("endTime") LocalDateTime endTime,
+                          @Param("userId") int userId);
 }

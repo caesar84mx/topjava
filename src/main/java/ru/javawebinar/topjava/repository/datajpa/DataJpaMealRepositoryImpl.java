@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public class DataJpaMealRepositoryImpl implements MealRepository {
 
-    private static final Sort SORT_DATE = new Sort("dateTime");
+    private static final Sort SORT_DATE = new Sort(Sort.Direction.DESC, "dateTime");
 
     @Autowired
     private CrudMealRepository crudMealRepository;
@@ -38,7 +38,10 @@ public class DataJpaMealRepositoryImpl implements MealRepository {
 
     @Override
     public Meal get(int id, int userId) {
-        return crudMealRepository.findOneByUserId(id, userId);
+        Meal meal = crudMealRepository.findOne(id);
+        if (meal == null || meal.getUser().getId() != userId) return null;
+
+        return meal;
     }
 
     @Override
