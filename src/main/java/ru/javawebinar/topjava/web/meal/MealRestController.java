@@ -1,77 +1,65 @@
 package ru.javawebinar.topjava.web.meal;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import ru.javawebinar.topjava.AuthorizedUser;
+import org.springframework.web.bind.annotation.*;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.to.MealWithExceed;
-import ru.javawebinar.topjava.util.DateTimeUtil;
-import ru.javawebinar.topjava.util.MealsUtil;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-import static ru.javawebinar.topjava.util.ValidationUtil.checkIdConsistent;
-import static ru.javawebinar.topjava.util.ValidationUtil.checkNew;
-
+/**
+ * Created by caesar_84 on 5/5/2017.
+ */
 @Controller
-public class MealRestController {
-    private static final Logger LOG = LoggerFactory.getLogger(MealRestController.class);
-
-    private final MealService service;
-
+@RequestMapping(value = "/meals")
+public class MealRestController extends AbstractMealController {
     @Autowired
     public MealRestController(MealService service) {
-        this.service = service;
+        super(service);
     }
 
-    public Meal get(int id) {
-        int userId = AuthorizedUser.id();
-        LOG.info("get meal {} for User {}", id, userId);
-        return service.get(id, userId);
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @Override
+    public Meal get(@PathVariable("id") int id) {
+        return super.get(id);
     }
 
-    public void delete(int id) {
-        int userId = AuthorizedUser.id();
-        LOG.info("delete meal {} for User {}", id, userId);
-        service.delete(id, userId);
+    @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
+    @Override
+    public void delete(@PathVariable("id") int id) {
+        super.delete(id);
     }
 
+    @RequestMapping(value = "/all", method = RequestMethod.GET)
+    @Override
     public List<MealWithExceed> getAll() {
-        int userId = AuthorizedUser.id();
-        LOG.info("getAll for User {}", userId);
-        return MealsUtil.getWithExceeded(service.getAll(userId), AuthorizedUser.getCaloriesPerDay());
+        return super.getAll();
     }
 
-    public Meal create(Meal meal) {
-        int userId = AuthorizedUser.id();
-        checkNew(meal);
-        LOG.info("create {} for User {}", meal, userId);
-        return service.save(meal, userId);
+    @RequestMapping(value = "/new", method = RequestMethod.POST)
+    @Override
+    public Meal create(@RequestBody Meal meal) {
+        return super.create(meal);
     }
 
-    public void update(Meal meal, int id) {
-        int userId = AuthorizedUser.id();
-        checkIdConsistent(meal, id);
-        LOG.info("update {} for User {}", meal, userId);
-        service.update(meal, userId);
+    @RequestMapping(value = "/update/{id}", method = RequestMethod.PUT)
+    @Override
+    public void update(@RequestBody Meal meal, @PathVariable("id") int id) {
+        super.update(meal, id);
     }
 
-    public List<MealWithExceed> getBetween(LocalDate startDate, LocalTime startTime, LocalDate endDate, LocalTime endTime) {
-        int userId = AuthorizedUser.id();
-        LOG.info("getBetween dates({} - {}) time({} - {}) for User {}", startDate, endDate, startTime, endTime, userId);
 
-        return MealsUtil.getFilteredWithExceeded(
-                service.getBetweenDates(
-                        startDate != null ? startDate : DateTimeUtil.MIN_DATE,
-                        endDate != null ? endDate : DateTimeUtil.MAX_DATE, userId),
-                startTime != null ? startTime : LocalTime.MIN,
-                endTime != null ? endTime : LocalTime.MAX,
-                AuthorizedUser.getCaloriesPerDay()
-        );
+    @RequestMapping(value = "/filtered")
+    @Override
+    public List<MealWithExceed> getBetween(
+            @RequestParam("startDate") LocalDate startDate,
+            @RequestParam("startTime") LocalTime startTime,
+            @RequestParam("endDate") LocalDate endDate,
+            @RequestParam("endTime") LocalTime endTime) {
+        return super.getBetween(startDate, startTime, endDate, endTime);
     }
 }
