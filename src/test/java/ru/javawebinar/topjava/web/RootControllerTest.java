@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static ru.javawebinar.topjava.UserTestData.USER;
@@ -23,6 +24,20 @@ public class RootControllerTest extends AbstractControllerTest {
                         allOf(
                                 hasProperty("id", is(START_SEQ)),
                                 hasProperty("name", is(USER.getName()))
+                        )
+                )));
+    }
+
+    @Test
+    public void testMeals() throws Exception {
+        mockMvc.perform(post("/users?userId=100001"))
+                .andExpect(redirectedUrl("meals"))
+                .andExpect(view().name("redirect:meals"))
+                .andExpect(redirectedUrl("meals"))
+                .andExpect(model().attribute("meals", hasSize(2)))
+                .andExpect(model().attribute("meals", hasItem(
+                        allOf(
+                                hasProperty("description", contains("Админ"))
                         )
                 )));
     }
